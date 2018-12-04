@@ -26,7 +26,7 @@ object Main {
       .setBatchSize(64)
       .setNumEpochs(1)
       .setLayerSize(128)
-      .setLearningRate(0.2)
+      .setLearningRate(0.05)
       .setMinLearningRate(0.0001)
       .setWindowSize(10)
       .setWalksPerVertex(10)
@@ -44,6 +44,6 @@ object Main {
     // Store the embeddings in a csv;
     val vertexVectors = model.getTrainedVertexVectors.flattenAll
     vertexVectors.write.overwrite(true).csv.separator(',').store(s"data/pgx-graphs/$graphName/embeddings.csv")
-    println("Embeddings stored in data/pgx-graphs/$graphName/embeddings.csv")
+    println(f"Embeddings stored in data/pgx-graphs/$graphName/embeddings.csv")
   }
 }
