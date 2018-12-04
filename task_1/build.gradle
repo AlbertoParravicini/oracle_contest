@@ -1,0 +1,64 @@
+plugins {
+    id 'idea'
+    id 'scala'
+    id 'application'
+}
+
+allprojects {
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+        /* PGX (releases) */
+        maven { url 'https://artifacthub.oraclecorp.com/labs-pgx-release-local' }
+        /* PGX (nightly) */
+        maven { url 'http://artifactory.oraclecorp.com/artifactory/labs-pgx-stage-local' }
+        maven { url 'http://artifactory.oraclecorp.com/artifactory/olabs-dev-local' }
+        maven { url 'http://artifactory.oraclecorp.com/artifactory/olabs-release-local' }
+        maven { url 'http://citadel.us.oracle.com/artifactory/libs-release-local' }
+        maven { url 'http://artifactory.oraclecorp.com/artifactory/libs-release-local' }
+        maven { url 'https://artifacthub.oraclecorp.com/ogcs-maven-release-local' }
+        /* third-parties */
+        maven { url 'http://artifactory.oraclecorp.com/artifactory/mw-virtual' }
+        maven { url 'http://artifacthub.oraclecorp.com/dbtools-dev-mvn-release' }
+        maven { url 'http://pgx.us.oracle.com/osg/repo' }
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+    ext {
+        pgxVersion = '3.3.0-BUILD-1057'
+        scalaVersion = '2.12.4'
+        gmVersion = '0.1.2-20180501-udf'
+    }
+
+    dependencies {
+        // scala
+        compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
+
+        // PGX
+        compile group: "oracle.pgx", name: "pgx-common", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-engine", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-file_loaders", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-pgql", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-gm", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-gm", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-rdf_loader", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-filter", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-mllib_api", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-deepwalk_dl4j", version: pgxVersion
+        compile group: "oracle.pgx", name: "pgx-pg2vec_dl4j", version: pgxVersion
+    }
+}
+
+apply plugin: "java"
+apply plugin: 'application'
+apply plugin: 'scala'
+
+mainClassName = 'Main'
