@@ -23,16 +23,16 @@ object Main {
     //   https://arxiv.org/pdf/1403.6652.pdf
     val model: DeepWalkModel = analyst.deepWalkModelBuilder()
       .setMinWordFrequency(1)
-      .setBatchSize(64)
+      .setBatchSize(512)
       .setNumEpochs(1)
       .setLayerSize(128)
       .setLearningRate(0.05)
       .setMinLearningRate(0.0001)
       .setWindowSize(10)
       .setWalksPerVertex(10)
-      .setWalkLength(80)
+      .setWalkLength(8)
       .setSampleRate(0.00001)
-      .setNegativeSample(20)
+      .setNegativeSample(5)
       .setValidationFraction(0.01)
       .build
 

@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # Remove useless columns;
     vertices_with_e.drop(columns=["summary", "tf-idf"], inplace=True)
     
-    # Divide in features and labels;
+    # Divide in features and labels (keep up to 501 to use only graph features, keep from 501 to use only embeddings);
     X = vertices_with_e.iloc[:, 1:].values
     y = vertices_with_e.iloc[:, 0].values
         
@@ -73,30 +73,38 @@ if __name__ == "__main__":
     
     #%% Create a classifier for the problem;
     
-    model = RandomForestClassifier(random_state=seed)
-    
-    param_grid = {
-            "n_estimators": [50, 100, 120, 150],
-            "max_depth": [None],
-            "max_features": [50, 90, 120],
-            "min_samples_split": [1, 2, 3],
-            "min_samples_leaf": [1, 2],
-            "bootstrap": [False, True]
-            }
- 
-    grid_clf = GridSearchCV(model, param_grid, cv=10, verbose=2, n_jobs=4)
-    grid_clf.fit(X_train, y_train)
-    
-    print("\n-------- BEST ESTIMATOR --------\n")
-    print(grid_clf.best_estimator_)
-    print("\n-------- BEST PARAMS --------\n")
-    print(grid_clf.best_params_)
-    print("\n-------- BEST SCORE --------\n")
-    print(grid_clf.best_score_)
-    
-    # Test with crossvalidation;
-#    scores = cross_val_score(model, X_train, y_train, cv=kfolds, n_jobs=2, verbose=2)
-#    print(f"Scores: {np.mean(scores)}")
+    model = RandomForestClassifier(
+            random_state=seed,
+            n_estimators=100,
+            max_depth=None,
+            min_samples_split=2,
+            max_features=120,
+            bootstrap=False
+            )
+
+    # Find the bes thyperparameters;    
+#    param_grid = {
+#            "n_estimators": [50, 100, 120, 150],
+#            "max_depth": [None],
+#            "max_features": [50, 90, 120],
+#            "min_samples_split": [2, 3],
+#            "min_samples_leaf": [1, 2],
+#            "bootstrap": [False, True]
+#            }
+# 
+#    grid_clf = GridSearchCV(model, param_grid, cv=10, verbose=2, n_jobs=4)
+#    grid_clf.fit(X_train, y_train)
+#    
+#    print("\n-------- Best Estimator --------\n")
+#    print(grid_clf.best_estimator_)
+#    print("\n-------- Best Parameters --------\n")
+#    print(grid_clf.best_params_)
+#    print("\n-------- Best Score --------\n")
+#    print(grid_clf.best_score_)
+#    
+    # As alternative, test with crossvalidation  the specified model;
+    scores = cross_val_score(model, X_train, y_train, cv=kfolds, n_jobs=2, verbose=2)
+    print(f"Scores: {np.mean(scores)}")
     
     
     #%% Train on the entire training set;
@@ -113,14 +121,64 @@ if __name__ == "__main__":
     y_val_pred = model.predict(X_val)
     get_score(y_val_pred, y_val)
     
+    # Validation accuracy of Random Forest, using 60% training and 20% validation.
+    #   Embedding + features: 90%
+    #   Embedding only: 73%
+    #   Features only: 88%
     
     
+    #%% Follow https://mila.quebec/wp-content/uploads/2018/07/d1ac95b60310f43bb5a0b8024522fbe08fb2a482.pdf
+    
+    # Use a training set of only 60 examples, and test on 1000 examples;
+    # Repeat 10 times, and average results. Also use 500 validation examples;
+    
+    model = RandomForestClassifier(
+            random_state=seed,
+            n_estimators=120,
+            max_depth=None,
+            min_samples_split=2,
+            max_features=50
+            )
+    
+    vertices_train, vertices_val = train_test_split(vertices_with_e, test_size=500, random_state=seed)
+    X_val = vertices_val.iloc[:, 1:].values
+    y_val = vertices_val.iloc[:, 0].values
+    
+    num_tests = 10
+    scores = []
+    seed = random.randint(0 ,2**32)
+    for _ in range(num_tests):
+        
+        # Creating a balanced sample requires to operate on the original dataframe;
+        vertices_t, vertices_test = train_test_split(vertices_train, test_size=1000,random_state=seed)
+        X_v = vertices_val.iloc[:, 1:].values
+        y_v = vertices_val.iloc[:, 0].values
+        
+        X1 = vertices_train[vertices_train["label"] == 1].sample(20)
+        X2 = vertices_train[vertices_train["label"] == 2].sample(20)
+        X3 = vertices_train[vertices_train["label"] == 3].sample(20)
+        
+        vertices_concat = pd.concat([X1, X2, X3])
+        
+        X_t = vertices_concat.iloc[:, 1:].values
+        y_t = vertices_concat.iloc[:, 0].values
+        
+        model.fit(X_t, y_t)
+        y_val_pred = model.predict(X_v)
+        scores += [hamming_accuracy(y_val_pred, y_v)]
+        
+    print(f"Mean accuracy, cross-validation: {np.mean(scores):.2f}")
+    
+    # Predict on the validation set;
+    print(f"\nValidation accuracy")
+    y_val_pred = model.predict(X_val)
+    get_score(y_val_pred, y_val)
     
     
-    
-    
-    
-    
+    # Validation accuracy of Random Forest, using 60% training and 20% validation.
+    #   Embedding + features: 71%
+    #   Embedding only: 59%
+    #   Features only: 63%
     
     
     
