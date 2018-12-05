@@ -129,9 +129,9 @@ if __name__ == "__main__":
     get_score(y_val_pred, y_val)
     
     # Validation accuracy of Random Forest, using 60% training and 20% validation.
-    #   Embedding + features: 90%
-    #   Embedding only: 73%
-    #   Features only: 88%
+    #   Embedding + features:
+    #   Embedding only:
+    #   Features only:
     
     
 
