@@ -13,10 +13,10 @@ import numpy as np
 
 if __name__ == "__main__":
     
-    graph_path = "../../../../data/ppi/ppi-G.json"
-    class_path = "../../../../data/ppi/ppi-class_map.json"
-    feat_path = "../../../../data/ppi/ppi-feats.npy"
-    id_path = "../../../../data/ppi/ppi-id_map.json"
+    graph_path = "../../../../data/original/ppi/ppi-G.json"
+    class_path = "../../../../data/original/ppi/ppi-class_map.json"
+    feat_path = "../../../../data/original/ppi/ppi-feats.npy"
+    id_path = "../../../../data/original/ppi/ppi-id_map.json"
         
     with open(graph_path, "r") as f:
         graph_dict = json.load(f)
@@ -48,6 +48,10 @@ if __name__ == "__main__":
         
         # Vertex class;
         classes = class_dict[str(v["id"])]
+        
+        # Add a 122th class, which is equal to 1 if all other classes are 0;
+        classes += [0 if any(x == 1 for x in classes) else 1]
+        
         class_vector = ";".join(str(x) for x in classes)
         
         # Features;
@@ -99,7 +103,7 @@ if __name__ == "__main__":
             "vertex_uris": ["ppi_v.csv"],
             "vertex_props": [
                     {"name": "dataset", "type": "string"},
-                    {"name": "labels", "type": "int", "dimension": 121},
+                    {"name": "labels", "type": "int", "dimension": 122},
                     {"name": "features", "type": "float", "dimension": 50}
                     ]
             }     

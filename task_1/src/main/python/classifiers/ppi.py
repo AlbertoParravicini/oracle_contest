@@ -7,16 +7,13 @@ Created on Tue Dec  4 14:41:33 2018
 """
 
 import pandas as pd
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.model_selection import train_test_split, KFold, cross_val_score, GridSearchCV
+from sklearn.model_selection import KFold, cross_val_score
 import random 
-from sklearn import preprocessing
 from sklearn.linear_model import SGDClassifier
-from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score
-
+import datetime
 
 def hamming_accuracy(prediction, true_values):
     """
@@ -27,11 +24,39 @@ def hamming_accuracy(prediction, true_values):
     """
     return np.sum(np.equal(prediction, true_values)) / float(true_values.size)
 
+
 def get_score(prediction, true_values):    
     print("\tHamming accuracy: {:.3f}".format(hamming_accuracy(prediction, true_values)))
     print("\tAccuracy, exact matches: {:.3f}".format(accuracy_score(prediction, true_values)))
     print("\tMacro F1 Score: {:.3f}".format(f1_score(y_true=true_values, y_pred=prediction, average="macro")))
     print("\tMicro F1 Score: {:.3f}".format(f1_score(y_true=true_values, y_pred=prediction, average="micro")))
+    
+
+def build_dataframe(input_data: pd.DataFrame, col_name: str) -> pd.DataFrame:
+    """
+    Given an input DataFrame and a column name, return a new DataFrame in which the column has been cleaned.
+    Used to transform features and labels columns from "0;1;1;0" to [0, 1, 1, 0]
+    """
+    vertices_dict = []
+    for i, row_i in input_data.iterrows():
+        features = [int(float(x)) for x in row_i[f"{col_name}s"].split(";")]
+        
+        new_v = {"id": i}
+        for j, f in enumerate(features):
+            new_v[f"{col_name}_{j}"] = f
+        vertices_dict += [new_v]
+    res_df = pd.DataFrame(vertices_dict)
+    return res_df.set_index("id")
+
+
+def bool_to_int(labels: list) -> list:
+    """
+    Turn a list of 0s and 1s into a list whose values are the indices of 1s.
+    Used to create a valid Kaggle submission.
+    E.g. [1, 0, 0, 1, 1] -> [0, 3, 4]
+    """
+    return [i for i, x in enumerate(labels) if x == 1]
+
 
 #%%
 
@@ -44,137 +69,68 @@ if __name__ == "__main__":
     embeddings_df = pd.read_csv(embeddings_path, header=None, index_col=0)
     embeddings_df.columns = ["e_" + str(col) for col in embeddings_df.columns]
 
-    # Read the graph to obtain the vertex features and classes;
-    vertices_path = f"../../../../data/pgx-graphs/{graph_name}/{graph_name}_v.csv"
+    # Read vertex features and classes in the training set;
+    vertices_path = f"../../../../data/pgx-graphs/{graph_name}/{graph_name}_train.csv"
+    vertices_train = pd.read_csv(vertices_path, sep=",", index_col="id")
+    vertices_train["dataset"] = "train"
     
-    vertices_df = pd.read_csv(vertices_path, sep=",", index_col="id")
-    
-    # Use a temporary dict representation to turn labels and features into independent columns;
-    vertices_dict = []
-    for i, row_i in vertices_df.iterrows():
-        labels = [int(x) for x in row_i["labels"].split(";")]
-        features = [float(x) for x in row_i["features"].split(";")]
+    # Read vertex features in the test/validation set;
+    vertices_path = f"../../../../data/pgx-graphs/{graph_name}/{graph_name}_test.csv"
+    vertices_test = pd.read_csv(vertices_path, sep=",", index_col="id")
+    vertices_test["dataset"] = "test"
         
-        new_v = {"id": vertices_df.index[i], "dataset": row_i["dataset"]}
-        for j, l in enumerate(labels):
-            new_v[f"label_{j}"] = l
-        for j, f in enumerate(features):
-            new_v[f"feature_{j}"] = f
-        vertices_dict += [new_v]
+    # Use a temporary dict representation to turn training set features into independent columns;
+    X_train_df = build_dataframe(vertices_train, "feature")
     
-    vertices_df = pd.DataFrame(vertices_dict)
-    cols = list(vertices_df)
+    # Do the same for the test set;
+    X_test_df = build_dataframe(vertices_test, "feature")
     
-    # Move the labels at the start;
-    cols = cols[52:] + cols[:52]
-    cols.insert(0, cols.pop(cols.index('id')))
-    cols.insert(1, cols.pop(cols.index('dataset')))
-    vertices_df = vertices_df.loc[:, cols]
-    vertices_df = vertices_df.set_index("id")
+    # Create a dataset with the labels of the training set;
+    y_train_df = build_dataframe(vertices_train, "label")
     
     
     #%% Add each vertex embedding to the vertices df;
-    vertices_with_e = pd.merge(vertices_df, embeddings_df, left_index=True, right_index=True)
+    X_train_df = pd.merge(X_train_df, embeddings_df, left_index=True, right_index=True, how="left")
+    X_test_df = pd.merge(X_test_df, embeddings_df, left_index=True, right_index=True, how="left")
     
-    # Divide the data in train, test, and validation,
-    #  according to the original paper (20 train graphs, 2 test and 2 validation graphs);
-    # https://arxiv.org/pdf/1706.02216.pdf
-    v_train = vertices_with_e[vertices_with_e["dataset"] == "train"]
-    v_test = vertices_with_e[vertices_with_e["dataset"] == "test"]
-    v_val = vertices_with_e[vertices_with_e["dataset"] == "val"]
-    
-    # Divide in features and labels (keep up to 172 in X_train to use only graph features, keep from 172 to use only embeddings);
-    X_train = v_train.iloc[:, 122:].values
-    y_train = v_train.iloc[:, 1:122].values
-    
-    X_test = v_test.iloc[:, 122:].values
-    y_test = v_test.iloc[:, 1:122].values
-    
-    X_val = v_val.iloc[:, 122:].values
-    y_val = v_val.iloc[:, 1:122].values
+   
+    #%% Create a classifier for the problem;
     
     # Define crossvalidation.
     # Note that we are not using the test set when doing crossvalidation,
     #  as test sets are generated by crossvalidation itself.
     # We can also use the test set instead of crossvalidation, but the accuracy estimation is usually worse;
-#    kfolds = KFold(n_splits=10)
-   
+    kfolds = KFold(n_splits=3)
     
-    #%% Create a classifier for the problem;
+    seed = random.randint(0, 2**32)
     
-#    seed = random.randint(0, 2**32)
-#    
-#    model = RandomForestClassifier(
-#            random_state=seed,
-##            n_estimators=100,
-##            max_depth=None,
-##            min_samples_split=2,
-##            max_features=50,
-#            )
-#    
-#    # Test with crossvalidation  the specified model;
-#    scores = cross_val_score(model, X_train, y_train, cv=kfolds, n_jobs=4, verbose=2)
-#    print(f"Scores: {np.mean(scores)}")
+    sgd = SGDClassifier(max_iter=10)
+    model = OneVsRestClassifier(sgd, n_jobs=1)
     
-    # TODO: implement micro macro f1 multilabel
+    # Test with crossvalidation the specified model;
+    scores = cross_val_score(model, X_train_df, y_train_df, cv=kfolds, n_jobs=2, verbose=2, scoring="f1_macro")
+    print(f"Scores: {np.mean(scores):.3f}")
+    
     
     #%% Train on the entire training set;
     
-#    model.fit(X_train, y_train)
-#    
-#    # Printing train scores;
-#    print("Train accuracy")
-#    y_train_pred = model.predict(X_train)
-#    get_score(y_train_pred, y_train)
-#    
-#    # Printing test scores;
-#    print("\nValidation accuracy")
-#    y_val_pred = model.predict(X_val)
-#    get_score(y_val_pred, y_val)
+    model.fit(X_train_df, y_train_df)
     
-    # Validation accuracy of Random Forest, using 60% training and 20% validation.
-    #   Embedding + features:
-    #   Embedding only:
-    #   Features only:
+    # Printing train scores (look for overfitting!);
+    print("Train accuracy")
+    y_train_pred = model.predict(X_train_df)
+    get_score(y_train_pred, y_train_df)
     
-    #%% 
+    # Predict on the test dataset;
+    print("\nValidation accuracy")
+    y_test_pred = model.predict(X_test_df)
     
-    # Use SGD like in GraphSAGE.
-    # We use a OneVsRestClassifier meta-classifier and fit an SGD on each label of the 121 classes;
     
-    sgd = SGDClassifier(max_iter=1000)
-    model = OneVsRestClassifier(sgd, n_jobs=32)
+    #%% Store the predictions in a file;
     
-    # Find the bes thyperparameters;    
-    param_grid = {
-            "estimator__loss": ["hinge", "log", "modified_huber"],
-            "estimator__penalty": ["l1", "l2", "elasticnet"]
-            }
-    
-    grid_clf = GridSearchCV(model, param_grid, cv=10, verbose=2, n_jobs=32, scoring="f1_micro")
-    grid_clf.fit(X_train, y_train)
-    
-    print("\n-------- Best Estimator --------\n")
-    print(grid_clf.best_estimator_)
-    print("\n-------- Best Parameters --------\n")
-    print(grid_clf.best_params_)
-    print("\n-------- Best Score --------\n")
-    print(grid_clf.best_score_)
-    
-#    model.fit(X_train, y_train)
-    
-    # Printing train scores;
-    print("Train accuracy:")
-    y_train_pred = grid_clf.predict(X_train)
-    get_score(y_train_pred, y_train)
-    
-    # Printing test scores;
-    print("\nValidation accuracy:")
-    y_val_pred = grid_clf.predict(X_val)
-    get_score(y_val_pred, y_val)
-    
-
-    
+    y_pred = [" ".join([str(y) for y in bool_to_int(x)]) for x in y_test_pred]
+    y_pred_df = pd.DataFrame(y_pred, columns=["labels"], index=X_test_df.index)
+    y_pred_df.to_csv(f"prediction_{datetime.datetime.now().strftime('%y_%m_%d_%H_%M_%S')}.csv")
     
     
     
