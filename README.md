@@ -11,6 +11,6 @@ All the data required for the contest, with format and description, can be found
 * `docs` contains the papers mentioned in the [Kaggle](https://www.kaggle.com/c/oracle-polimi-contest#Documents) page.
 * `src` contains the **Scala** and **Python** code required for the project.  
 The Scala code allows you to create vertex embeddings using **DeepWalk** and **Pgx**.  
-The Python code is creates the graphs from their original format (we did that already, you don't need this code), and defines a couple of example **classifiers** that you can reuse or take inspiration from.
+The Python code creates the graphs from their original format (we did that already, you don't need this code), and defines a couple of example **classifiers** that you can reuse or take inspiration from.
 
 All the data files (graphs and embeddings) should be placed in `task_1/data/pgx-graphs/ppi`.
