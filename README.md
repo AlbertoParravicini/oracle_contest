@@ -14,3 +14,15 @@ The Scala code allows you to create vertex embeddings using **DeepWalk** and **P
 The Python code creates the graphs from their original format (we did that already, you don't need this code), and defines a couple of example **classifiers** that you can reuse or take inspiration from.
 
 All the data files (graphs and embeddings) should be placed in `task_1/data/pgx-graphs/ppi`.
+
+
+***
+
+To run the Python code, a standard Python 3.x installation with Anaconda should be enough. 
+Make sure to have `numpy`, `pandas`, `scikit-learn`, and optionally `networkx` and `keras` with a `tensorflow` backend.
+It is recommended to run it inside and IDE like **Spyder** or **pyCharm** (you can obtain the full version for free, as a Polimi student).
+
+***
+
+Running the `scala` code is a bit more complicated.
+* First, 
