@@ -7,39 +7,13 @@ Created on Tue Dec  4 14:41:33 2018
 """
 
 import pandas as pd
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, GridSearchCV
 import random 
-from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import f1_score
 
-
-def hamming_accuracy(prediction, true_values):
-    """
-    Metric used in multioutput-label classification,
-    for each example measures the % of correctly predicted labels.
-    
-    Equivalent to traditional accuracy in a single-output scenario;
-    """
-    return np.sum(np.equal(prediction, true_values)) / float(true_values.size)
-
-
-def get_score(prediction, true_values):    
-    print("\tHamming accuracy: {:.3f}".format(hamming_accuracy(prediction, true_values)))
-    print("\tAccuracy, exact matches: {:.3f}".format(accuracy_score(prediction, true_values)))
-    print("\tMacro F1 Score: {:.3f}".format(f1_score(y_true=true_values, y_pred=prediction, average="macro")))
-    print("\tMicro F1 Score: {:.3f}".format(f1_score(y_true=true_values, y_pred=prediction, average="micro")))
-    
-    
-def bool_to_int(labels: list) -> list:
-    """
-    Turn a list of 0s and 1s into a list whose values are the indices of 1s.
-    Used to create a valid Kaggle submission.
-    E.g. [1, 0, 0, 1, 1] -> [0, 3, 4]
-    """
-    return [i for i, x in enumerate(labels) if x == 1]
+import classifier_utils as utils
 
 
 #%%
@@ -123,12 +97,12 @@ if __name__ == "__main__":
     # Printing train scores;
     print("Train accuracy:")
     y_train_pred = model.predict(X_train)
-    get_score(y_train_pred, y_train)
+    utils.get_score(y_train_pred, y_train)
     
     # Printing test scores;
     print("\nValidation accuracy:")
     y_val_pred = model.predict(X_val)
-    get_score(y_val_pred, y_val)
+    utils.get_score(y_val_pred, y_val)
     
     # Validation accuracy of Random Forest, using 60% training and 20% validation.
     #   Embedding + features: 90%
@@ -177,7 +151,7 @@ if __name__ == "__main__":
     # Predict on the validation set;
     print(f"\nValidation accuracy")
     y_val_pred = model.predict(X_val)
-    get_score(y_val_pred, y_val)
+    utils.get_score(y_val_pred, y_val)
     
     
     # Validation accuracy of Random Forest, using 60% training and 20% validation.
