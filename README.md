@@ -30,3 +30,7 @@ Running the `scala` code is also very simple.
 
 We tested it with Centos 7, Ubuntu 16.04 and Ubuntu 16.04 inside the Windows 10 Linux Subsystem.
 With the Linux Subsystem you might get some `mbind: Function not implemented` messages when loading the graph: don't get scared, it will still work!
+
+***
+
+**Important:** please do not redistribute any of the `jars` in the `libs` folder, they are intender for personal use only!
