@@ -34,3 +34,5 @@ With the Linux Subsystem you might get some `mbind: Function not implemented` me
 ***
 
 **Important:** please do not redistribute any of the `jars` in the `libs` folder, they are intender for personal use only!
+This also means that they shouldn't be in your repository, if you plan to make it public.
+Advice: add `libs/*.jar` to your `.gitignore` file.
