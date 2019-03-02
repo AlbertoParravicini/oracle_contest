@@ -58,12 +58,13 @@ export PATH=${PATH}:${CUDA_9_0_HOME}/bin
 4. Move to your shared folder (it is located at /home/shared_data/name.surname on all the cluster machines)
 5. Download the datasets in the shared folder using the scripts inside the task_2 folder of this repository
 6. start running tasks on slurm
+7. If you have trouble launching tasks on the cluster (e.g. missing dependencies and libraries, issues with files, etc.), please contact us
 
 ### Slurm cluster facilities
 
 The slurm cluster is a small cluster built for the purpose of this contest. After the contest everything will be deleted, so remember to save all your important files somewhere else.
 
 The cluster is composed of 5 nodes:
-* **slurm-cuda-entrypoint** this is the machine where you log-in and where you compile code and launch tasks on the cluster
-* **slurm-cuda-master** this is the slurm master, it provides 10 cores and 100GB of RAM, so it may be useful if you want to convert the datasets format
-* **dwarf1, dwarf6, dwarf7** this are the GPU nodes, they provide a GTX 960 with 2GB of RAM, an 8 cores Intel core i7 and 32GB of RAM
+* **slurm-cuda-entrypoint** this is the machine where you log-in and where you compile code and launch tasks on the cluster. Remember to put the datasets inside your shared folder, otherwise you will not see them when you launch the task on a GPU node. Moreover, this machine has just 50GB of local storage, please do not fill it.
+* **slurm-cuda-master** this is the slurm master, it provides 10 cores and 100GB of RAM, so it may be useful if you want to convert the datasets format.
+* **dwarf1, dwarf6, dwarf7** these are the GPU nodes, they provide a GTX 960 with 2GB of RAM, an 8 cores Intel core i7 each and 32GB of RAM.
