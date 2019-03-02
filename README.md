@@ -18,7 +18,7 @@ All the data files (graphs and embeddings) should be placed in `task_1/data/pgx-
 
 ***
 
-To run the Python code, a standard Python 3.x installation with Anaconda should be enough. 
+To run the Python code, a standard Python 3.x installation with Anaconda should be enough.
 Make sure to have `numpy`, `pandas`, `scikit-learn`, and optionally `networkx` and `keras` with a `tensorflow` backend.
 It is recommended to run it inside and IDE like **Spyder** or **pyCharm** (you can obtain the full version for free, as a Polimi student).
 
@@ -36,3 +36,34 @@ With the Linux Subsystem you might get some `mbind: Function not implemented` me
 **Important:** please do not redistribute any of the `jars` in the `libs` folder, they are intender for personal use only!
 This also means that they shouldn't be in your repository, if you plan to make it public.
 Advice: add `libs/*.jar` to your `.gitignore` file.
+
+***
+
+## Task 2
+
+This folder contains source code of the checker for the PR values as well as the scripts to download and unzip the datasets and the truth values of PR computed with the NVIDIA nvgraph pragerank implementation (https://docs.nvidia.com/cuda/nvgraph/index.html#nvgraph-pagerank-example) that can be found in the samples code in /usr/local/cuda-9.0/samples/7_CUDALibraries/nvgraph_Pagerank.
+
+Instructions to run the checker are provided in the checker folder.
+
+### Setup your environment to run code on the slurm cluster
+
+1. Connect to the NECSTLab VPN (we will provide a bundle)
+2. Login with name.surname to slurm-cuda-entrypoint.local.necst.it
+3. edit your .bashrc file to set the CUDA version you are running with
+```
+export CUDA_9_0_HOME=/usr/local/cuda-9.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_9_0_HOME}/lib64
+export PATH=${PATH}:${CUDA_9_0_HOME}/bin
+```
+4. Move to your shared folder (it is located at /home/shared_data/name.surname on all the cluster machines)
+5. Download the datasets in the shared folder using the scripts inside the task_2 folder of this repository
+6. start running tasks on slurm
+
+### Slurm cluster facilities
+
+The slurm cluster is a small cluster built for the purpose of this contest. After the contest everything will be deleted, so remember to save all your important files somewhere else.
+
+The cluster is composed of 5 nodes:
+* **slurm-cuda-entrypoint** this is the machine where you log-in and where you compile code and launch tasks on the cluster
+* **slurm-cuda-master** this is the slurm master, it provides 10 cores and 100GB of RAM, so it may be useful if you want to convert the datasets format
+* **dwarf1, dwarf6, dwarf7** this are the GPU nodes, they provide a GTX 960 with 2GB of RAM, an 8 cores Intel core i7 and 32GB of RAM
