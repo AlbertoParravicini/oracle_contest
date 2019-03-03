@@ -32,6 +32,17 @@ The cluster is composed of 5 nodes:
 * **slurm-cuda-master** this is the slurm master, it provides 10 cores and 100GB of RAM, so it may be useful if you want to convert the datasets format.
 * **dwarf1, dwarf6, dwarf7** these are the GPU nodes, they provide a GTX 960 with 2GB of RAM, an 8 cores Intel core i7 each and 32GB of RAM.
 
+### Output files and competition submission
+
+The submission is your code, so help us run it! :)
+
+Try to script the various steps of the computation (a.k.a. graph transformation, compilation and parametric execution). Try also to create code that accepts dataset paths as command line input.
+
+The Pagerank implementation should provide as output two files (provided as input the dataset needed for a single computation of PR):
+
+1. Pagerank Scores, filename `pagerank_gpu`, one vertex per line formatted as `vertex_name PR_score`
+2. Execution time, filename `execution_time_gpu`, one line with the execution time
+
 ***
 
 ## Task 2
