@@ -35,6 +35,7 @@ The cluster is composed of 5 nodes:
 ### Output files and competition submission
 
 The submission is your code, so help us run it! :)
+We will download the code from your repository in the state it was at the last commit before the deadline.
 
 Try to script the various steps of the computation (a.k.a. graph transformation, compilation and parametric execution). Try also to create code that accepts dataset paths as command line input.
 
