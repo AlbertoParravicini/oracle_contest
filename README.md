@@ -14,18 +14,17 @@ Instructions to run the checker are provided in the checker folder.
 
 ### Setup your environment to run code on the slurm cluster
 
-1. Connect to the NECSTLab VPN (we will provide a bundle)
-2. Login with name.surname to slurm-cuda-entrypoint.local.necst.it
-3. edit your .bashrc file to set the CUDA version you are running with
+1. Login with name.surname to slurm-cuda-entrypoint.necst.it (we will let you know when your credentials will be available)
+2. edit your .bashrc file to set the CUDA version you are running with
 ```
 export CUDA_9_0_HOME=/usr/local/cuda-9.0
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_9_0_HOME}/lib64
 export PATH=${PATH}:${CUDA_9_0_HOME}/bin
 ```
-4. Move to your shared folder (it is located at /home/shared_data/name.surname on all the cluster machines)
-5. Download the datasets in the shared folder using the scripts inside the task_2 folder of this repository
-6. start running tasks on slurm
-7. If you have trouble launching tasks on the cluster (e.g. missing dependencies and libraries, issues with files, etc.), please contact us
+3. Move to your shared folder (it is located at /home/shared_data/name.surname on all the cluster machines)
+4. Download the datasets in the shared folder using the scripts inside the task_2 folder of this repository
+5. start running tasks on slurm
+6. If you have trouble launching tasks on the cluster (e.g. missing dependencies and libraries, issues with files, etc.), please contact us
 
 ### Slurm cluster facilities
 
