@@ -1,6 +1,8 @@
 # oracle_contest
 Repository of the Oracle graph analytics contest in collaboration with Politecnico di Milano
 
+Registration to the Kaggle contest: https://www.kaggle.com/t/2e9f25364f3b479a923a4e079a78c723
+
 
 ## Task 1
 
