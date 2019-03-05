@@ -3,6 +3,8 @@ Repository of the Oracle graph analytics contest in collaboration with Politecni
 
 **Registration to the Kaggle contest:** https://www.kaggle.com/t/2e9f25364f3b479a923a4e079a78c723
 
+**Please clone this repository or make your own fork, don't push directly to this repository!**
+
 
 ## Task 1
 
