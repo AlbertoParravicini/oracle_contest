@@ -22,7 +22,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_9_0_HOME}/lib64
 export PATH=${PATH}:${CUDA_9_0_HOME}/bin
 ```
 3. Move to your shared folder (it is located at /home/shared_data/name.surname on all the cluster machines)
-4. Download the datasets in the shared folder using the scripts inside the task_2 folder of this repository
+4. Download the datasets in the shared folder using the scripts inside the task_1 folder of this repository
 5. start running tasks on slurm
 6. If you have trouble launching tasks on the cluster (e.g. missing dependencies and libraries, issues with files, etc.), please contact us
 
