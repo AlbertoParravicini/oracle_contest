@@ -61,7 +61,7 @@ All the data required for the contest, with format and description, can be found
 The Scala code allows you to create vertex embeddings using **DeepWalk** and **Pgx**.  
 The Python code creates the graphs from their original format (we did that already, you don't need this code), and defines a couple of example **classifiers** that you can reuse or take inspiration from.
 
-All the data files (graphs and embeddings) should be placed in `task_1/data/pgx-graphs/ppi`.
+All the data files (graphs and embeddings) should be placed in `task_2/data/pgx-graphs/ppi`.
 
 
 ***
@@ -73,8 +73,8 @@ It is recommended to run it inside and IDE like **Spyder** or **pyCharm** (you c
 ***
 
 Running the `scala` code is also very simple.
-* Go to the `task_1` folder.
-* Execute `./gradlew run`: this will download the required dependencies and run `task_1/src/main/scala/Main.scala`.
+* Go to the `task_2` folder.
+* Execute `./gradlew run`: this will download the required dependencies and run `task_2/src/main/scala/Main.scala`.
 
 We tested it with Centos 7, Ubuntu 16.04 and Ubuntu 16.04 inside the Windows 10 Linux Subsystem.
 With the Linux Subsystem you might get some `mbind: Function not implemented` messages when loading the graph: don't get scared, it will still work!
