@@ -5,7 +5,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val graphName = "pubmed"
+    val graphName = "ppi"
 
     val graphPath = s"data/pgx-graphs/$graphName/${graphName}_no_prop.json"
 
